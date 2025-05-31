@@ -78,10 +78,11 @@ jobs:
 
     - name: Create deb package
       working-directory: ${{github.workspace}}/build
-      ${{ if eq(matrix.os, 'ubuntu-latest') }}:
-        run: |
+      run: 
+        if eq(matrix.os, 'ubuntu-latest'){
           cpack -G DEB 
           cpack -G RPM
+        }
       elif: matrix.os == 'windows-latest'
       run: |
         cpack -G WIX
