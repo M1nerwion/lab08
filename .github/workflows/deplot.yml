@@ -46,7 +46,6 @@ jobs:
         sudo apt-get -qq update
         sudo apt-get install -y cmake
         sudo apt-get install rpm
-        sudo apt-get install deb
 
     - name: Set reusable strings
       id: strings
