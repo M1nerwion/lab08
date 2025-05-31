@@ -79,7 +79,17 @@ jobs:
     - name: Create deb package
       if: matrix.os == 'ubuntu-latest'
       working-directory: ${{github.workspace}}/build
-      run: cpack -G DEB RPM
+      run: |
+        cpack -G DEB 
+        cpack -G RPM
+    
+    # - name: Upload artifact
+    #   uses: actions/upload-artifact@v4
+    #   with:
+    #     name: ubuntu-pack
+    #     path: |
+    #       build/*.deb
+    #       build/*.rpm
 
     - name: Create Release
       if: matrix.os == 'ubuntu-latest'
