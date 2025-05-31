@@ -82,13 +82,12 @@ jobs:
         if eq(matrix.os, 'ubuntu-latest'){
           cpack -G DEB 
           cpack -G RPM
+        } elseif eq(matrix.os, 'windows-latest'){
+          cpack -G WIX
+        } else {
+          cpack -G DragNDrop 
         }
-      elif: matrix.os == 'windows-latest'
-      run: |
-        cpack -G WIX
-      if: matrix.os == 'macos-latest'
-      run: |
-        cpack -G DragNDrop  
+         
     
     - name: Upload artifact
       uses: actions/upload-artifact@v4
