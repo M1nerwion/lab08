@@ -82,7 +82,7 @@ jobs:
       run: |
         cpack -G DEB 
         cpack -G RPM
-      elseif: matrix.os == 'windows-latest'
+      elif: matrix.os == 'windows-latest'
       run: |
         cpack -G WIX
       if: matrix.os == 'macos-latest'
