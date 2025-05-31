@@ -92,18 +92,23 @@ jobs:
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        if eq(matrix.os, 'ubuntu-latest'){
-          name: ubuntu-pack
-          path: |
+        name:
+          if eq(matrix.os, 'ubuntu-latest'){
+            ubuntu-pack
+          } elseif eq(matrix.os, 'windows-latest'){
+            win-pack
+          } else {
+            macos-pack
+          }
+        path:
+          if eq(matrix.os, 'ubuntu-latest'){
             build/*.deb
             build/*.rpm
-        } elseif eq(matrix.os, 'windows-latest'){
-          name: win-pack
-          path: build/*.msi
-        } else {
-          name: macos-pack
-          path: build/*.dmg
-        }
+          } elseif eq(matrix.os, 'windows-latest'){
+            build/*.msi
+          } else {
+            build/*.dmg
+          } 
 
   create_release:
     needs: [rabota]
