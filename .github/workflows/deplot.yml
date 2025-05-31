@@ -7,7 +7,7 @@ on:
     branches: [ "master" ]
 
 jobs:
-  build:
+  rabota:
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -77,27 +77,79 @@ jobs:
     #   run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
     - name: Create deb package
-      if: matrix.os == 'ubuntu-latest'
       working-directory: ${{github.workspace}}/build
+      if: matrix.os == 'ubuntu-latest'
       run: |
         cpack -G DEB 
         cpack -G RPM
+      if: matrix.os == 'windows-latest'
+      run: |
+        cpack -G WIX
+      if: matrix.os == 'macos-latest'
+      run: |
+        cpack -G DragNDrop  
     
-    # - name: Upload artifact
-    #   uses: actions/upload-artifact@v4
-    #   with:
-    #     name: ubuntu-pack
-    #     path: |
-    #       build/*.deb
-    #       build/*.rpm
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      if: matrix.os == 'ubuntu-latest'
+      with:
+        name: ubuntu-pack
+        path: |
+          build/*.deb
+          build/*.rpm
+      if: matrix.os == 'windows-latest'
+      with:
+        name: win-pack
+        path: build/*.msi
+      if: matrix.os == 'macos-latest'
+      with:
+        name: macos-pack
+        path: build/*.dmg
+
+  create_release:
+    needs: [rabota]
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: download_ubuntu
+      uses: actions/download-artifact@v4
+      with:
+        name: ubuntu-pack
+        path: artifacts/linux
+
+    - name: download_windows
+      uses: actions/download-artifact@v4
+      with:
+        name: win-pack
+        path: artifacts/windows
+
+    - name: download_macos
+      uses: actions/download-artifact@v4 
+      with:
+        name: macos-pack
+        path: artifacts/macos
 
     - name: Create Release
-      if: matrix.os == 'ubuntu-latest'
       uses: softprops/action-gh-release@v2
       with:
         tag_name: v1.${{ github.run_number }}
         name: Release v1.${{ github.run_number }}
-        files: build/*.deb
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        files: |
+          artifacts/linux/*.deb
+          artifacts/linux/*.rpm
+          artifacts/windows/*.msi
+          artifacts/macos/*.dmg 
+          
+
+    # - name: Create Release
+    #   if: matrix.os == 'ubuntu-latest'
+    #   uses: softprops/action-gh-release@v2
+    #   with:
+    #     tag_name: v1.${{ github.run_number }}
+    #     name: Release v1.${{ github.run_number }}
+    #     files: build/*.deb
+        # env:
+        #   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
