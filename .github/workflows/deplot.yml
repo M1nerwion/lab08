@@ -79,10 +79,10 @@ jobs:
     - name: Create deb package
       working-directory: ${{github.workspace}}/build
       run: 
-        if eq(matrix.os, 'ubuntu-latest'){
+        if eq(${{matrix.os}}, 'ubuntu-latest'){
           cpack -G DEB 
           cpack -G RPM
-        } elseif eq(matrix.os, 'windows-latest'){
+        } elseif eq(${{matrix.os}}, 'windows-latest'){
           cpack -G WIX
         } else {
           cpack -G DragNDrop 
