@@ -112,7 +112,7 @@ jobs:
           artifacts/linux/*.rpm
           artifacts/windows/*.msi
           artifacts/macos/*.dmg
-          artifacts/windows/*.zip
-          artifacts/macos/*.tgz 
+          artifacts/linux/*.zip
+          artifacts/linux/*.tar.gz 
           
 
