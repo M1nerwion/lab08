@@ -31,6 +31,8 @@ jobs:
           - os: ubuntu-latest
             cpack_flag: RPM
             extension: rpm
+            c_compiler: gcc
+            cpp_compiler: g++
           - os: macos-latest
             cpack_flag: DragNDrop
             extension: dmg
