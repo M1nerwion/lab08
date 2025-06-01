@@ -28,7 +28,7 @@ jobs:
             extension: rpm
           - os: ubuntu-latest
             cpack_flag: TGZ
-            extension: tgz
+            extension: tar.gz
           - os: ubuntu-latest
             cpack_flag: ZIP
             extension: zip 
@@ -99,7 +99,7 @@ jobs:
     - name: download_ubuntu_tgz
       uses: actions/download-artifact@v4
       with:
-        name: ubuntu-latest-tgz-pack
+        name: ubuntu-latest-tar.gz-pack
         path: artifacts/linux   
 
     - name: Create Release
@@ -111,6 +111,8 @@ jobs:
           artifacts/linux/*.deb
           artifacts/linux/*.rpm
           artifacts/windows/*.msi
-          artifacts/macos/*.dmg 
+          artifacts/macos/*.dmg
+          artifacts/windows/*.zip
+          artifacts/macos/*.tgz 
           
 
