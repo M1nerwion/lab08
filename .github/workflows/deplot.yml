@@ -8,9 +8,10 @@ on:
 
 jobs:
   rabota:
-    runs-on: ${{ matrix.os }}
+    
 
     strategy:
+      runs-on: ${{ matrix.os }}
       fail-fast: false
       #matrix:
         # include:
