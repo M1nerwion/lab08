@@ -79,10 +79,10 @@ jobs:
     - name: Create deb package
       working-directory: ${{github.workspace}}/build
       run: 
-        if eq(${matrix.os}, 'ubuntu-latest'){
+        if eq(${{matrix.os}}, ubuntu-latest){
           cpack -G DEB 
           cpack -G RPM
-        } elseif eq(${matrix.os}, 'windows-latest'){
+        } elseif eq(${{matrix.os}}, windows-latest){
           cpack -G WIX
         } else {
           cpack -G DragNDrop 
@@ -93,18 +93,18 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name:
-          if eq(matrix.os, 'ubuntu-latest'){
+          if eq(${{matrix.os}}, 'ubuntu-latest'){
             ubuntu-pack
-          } elseif eq(matrix.os, 'windows-latest'){
+          } elseif eq(${{matrix.os}}, windows-latest){
             win-pack
           } else {
             macos-pack
           }
         path:
-          if eq(matrix.os, 'ubuntu-latest'){
+          if eq(${{matrix.os}}, ubuntu-latest){
             build/*.deb
             build/*.rpm
-          } elseif eq(matrix.os, 'windows-latest'){
+          } elseif eq(${{matrix.os}}, windows-latest){
             build/*.msi
           } else {
             build/*.dmg
