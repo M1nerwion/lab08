@@ -1,4 +1,4 @@
-name: CMake on multiple platforms
+name: Laba6
 
 on:
   push:
@@ -11,7 +11,7 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     strategy:
-      fail-fast: false
+      fail-fast: true
 
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
@@ -85,8 +85,6 @@ jobs:
       working-directory: ${{github.workspace}}/build
       run: cpack -G ${{ matrix.cpack_flag }}
      
-         
-    
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
@@ -136,13 +134,6 @@ jobs:
           artifacts/macos/*.dmg 
           
 
-    # - name: Create Release
-    #   if: matrix.os == 'ubuntu-latest'
-    #   uses: softprops/action-gh-release@v2
-    #   with:
-    #     tag_name: v1.${{ github.run_number }}
-    #     name: Release v1.${{ github.run_number }}
-    #     files: build/*.deb
         # env:
         #   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
