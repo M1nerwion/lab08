@@ -29,6 +29,8 @@ jobs:
             cpack_flag: DEB
             extension: deb
           - os: ubuntu-latest
+            c_compiler: gcc
+            cpp_compiler: g++
             cpack_flag: RPM
             extension: rpm
           - os: macos-latest
