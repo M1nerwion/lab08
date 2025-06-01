@@ -135,25 +135,25 @@ jobs:
     - name: download_ubuntu_deb
       uses: actions/download-artifact@v4
       with:
-        name: ubuntu-deb-pack
+        name: ubuntu-latest-deb-pack
         path: artifacts/linux
 
     - name: download_ubuntu_rpm
       uses: actions/download-artifact@v4
       with:
-        name: ubuntu-rpm-pack
+        name: ubuntu-latest-rpm-pack
         path: artifacts/linux
 
     - name: download_windows
       uses: actions/download-artifact@v4
       with:
-        name: win-msi-pack
+        name: windows-latest-msi-pack
         path: artifacts/windows
 
     - name: download_macos
       uses: actions/download-artifact@v4 
       with:
-        name: macos-dmg-pack
+        name: macos-latest-dmg-pack
         path: artifacts/macos
 
     - name: Create Release
