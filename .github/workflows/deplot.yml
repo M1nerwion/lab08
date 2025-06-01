@@ -19,22 +19,23 @@ jobs:
         c_compiler: [gcc, clang, cl]
         include:
           - os: windows-latest
-            c_compiler: cl
-            cpp_compiler: cl
             cpack_flag: WIX
             extension: msi
+            c_compiler: cl
+            cpp_compiler: cl
           - os: ubuntu-latest
-            c_compiler: gcc
-            cpp_compiler: g++
             cpack_flag: DEB
             extension: deb
+            c_compiler: gcc
+            cpp_compiler: g++
+          - os: ubuntu-latest
             cpack_flag: RPM
             extension: rpm
           - os: macos-latest
-            c_compiler: clang
-            cpp_compiler: clang++
             cpack_flag: DragNDrop
             extension: dmg
+            c_compiler: clang
+            cpp_compiler: clang++
         exclude:
           - os: windows-latest
             c_compiler: gcc
