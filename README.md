@@ -1,22 +1,26 @@
-## HOMEWORK Lab III
 
-Данная лабораторная работа посвещена изучению систем автоматизации сборки проекта на примере **CMake**
+## Laboratory work VI
+
+Данная лабораторная работа посвещена изучению средств пакетирования на примере **CPack**
 
 ```sh
-$ open https://cmake.org/
+$ open https://cmake.org/Wiki/CMake:CPackPackageGenerators
 ```
 
 ## Tasks
 
-- [ ] 1. Создать публичный репозиторий с названием **lab03** на сервисе **GitHub**
-- [ ] 2. Ознакомиться со ссылками учебного материала
-- [ ] 3. Выполнить инструкцию учебного материала
+- [ ] 1. Создать публичный репозиторий с названием **lab06** на сервисе **GitHub**
+- [ ] 2. Выполнить инструкцию учебного материала
+- [ ] 3. Ознакомиться со ссылками учебного материала
 - [ ] 4. Составить отчет и отправить ссылку личным сообщением в **Slack**
 
 ## Tutorial
 
 ```sh
 $ export GITHUB_USERNAME=<имя_пользователя>
+$ export GITHUB_EMAIL=<адрес_почтового_ящика>
+$ alias edit=<nano|vi|vim|subl>
+$ alias gsed=sed # for *-nix system
 ```
 
 ```sh
@@ -26,127 +30,146 @@ $ source scripts/activate
 ```
 
 ```sh
-$ git clone https://github.com/${GITHUB_USERNAME}/lab02.git projects/lab03
-$ cd projects/lab03
+$ git clone https://github.com/${GITHUB_USERNAME}/lab05 projects/lab06
+$ cd projects/lab06
 $ git remote remove origin
-$ git remote add origin https://github.com/${GITHUB_USERNAME}/lab03.git
+$ git remote add origin https://github.com/${GITHUB_USERNAME}/lab06
 ```
 
 ```sh
-$ g++ -std=c++11 -I./include -c sources/print.cpp
-$ ls print.o
-$ nm print.o | grep print
-$ ar rvs print.a print.o
-$ file print.a
-$ g++ -std=c++11 -I./include -c examples/example1.cpp
-$ ls example1.o
-$ g++ example1.o print.a -o example1
-$ ./example1 && echo
+$ gsed -i '/project(print)/a\
+set(PRINT_VERSION_STRING "v\${PRINT_VERSION}")
+' CMakeLists.txt
+$ gsed -i '/project(print)/a\
+set(PRINT_VERSION\
+  \${PRINT_VERSION_MAJOR}.\${PRINT_VERSION_MINOR}.\${PRINT_VERSION_PATCH}.\${PRINT_VERSION_TWEAK})
+' CMakeLists.txt
+$ gsed -i '/project(print)/a\
+set(PRINT_VERSION_TWEAK 0)
+' CMakeLists.txt
+$ gsed -i '/project(print)/a\
+set(PRINT_VERSION_PATCH 0)
+' CMakeLists.txt
+$ gsed -i '/project(print)/a\
+set(PRINT_VERSION_MINOR 1)
+' CMakeLists.txt
+$ gsed -i '/project(print)/a\
+set(PRINT_VERSION_MAJOR 0)
+' CMakeLists.txt
+$ git diff
 ```
 
 ```sh
-$ g++ -std=c++11 -I./include -c examples/example2.cpp
-$ nm example2.o
-$ g++ example2.o print.a -o example2
-$ ./example2
-$ cat log.txt && echo
+$ touch DESCRIPTION && edit DESCRIPTION
+$ touch ChangeLog.md
+$ export DATE="`LANG=en_US date +'%a %b %d %Y'`"
+$ cat > ChangeLog.md <<EOF
+* ${DATE} ${GITHUB_USERNAME} <${GITHUB_EMAIL}> 0.1.0.0
+- Initial RPM release
+EOF
 ```
 
 ```sh
-$ rm -rf example1.o example2.o print.o
-$ rm -rf print.a
-$ rm -rf example1 example2
-$ rm -rf log.txt
+$ cat > CPackConfig.cmake <<EOF
+include(InstallRequiredSystemLibraries)
+EOF
 ```
 
 ```sh
-$ cat > CMakeLists.txt <<EOF
-cmake_minimum_required(VERSION 3.4)
-project(print)
+$ cat >> CPackConfig.cmake <<EOF
+set(CPACK_PACKAGE_CONTACT ${GITHUB_EMAIL})
+set(CPACK_PACKAGE_VERSION_MAJOR \${PRINT_VERSION_MAJOR})
+set(CPACK_PACKAGE_VERSION_MINOR \${PRINT_VERSION_MINOR})
+set(CPACK_PACKAGE_VERSION_PATCH \${PRINT_VERSION_PATCH})
+set(CPACK_PACKAGE_VERSION_TWEAK \${PRINT_VERSION_TWEAK})
+set(CPACK_PACKAGE_VERSION \${PRINT_VERSION})
+set(CPACK_PACKAGE_DESCRIPTION_FILE \${CMAKE_CURRENT_SOURCE_DIR}/DESCRIPTION)
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "static C++ library for printing")
+EOF
+```
+
+```sh
+$ cat >> CPackConfig.cmake <<EOF
+
+set(CPACK_RESOURCE_FILE_LICENSE \${CMAKE_CURRENT_SOURCE_DIR}/LICENSE)
+set(CPACK_RESOURCE_FILE_README \${CMAKE_CURRENT_SOURCE_DIR}/README.md)
+EOF
+```
+
+```sh
+$ cat >> CPackConfig.cmake <<EOF
+
+set(CPACK_RPM_PACKAGE_NAME "print-devel")
+set(CPACK_RPM_PACKAGE_LICENSE "MIT")
+set(CPACK_RPM_PACKAGE_GROUP "print")
+set(CPACK_RPM_CHANGELOG_FILE \${CMAKE_CURRENT_SOURCE_DIR}/ChangeLog.md)
+set(CPACK_RPM_PACKAGE_RELEASE 1)
+EOF
+```
+
+```sh
+$ cat >> CPackConfig.cmake <<EOF
+
+set(CPACK_DEBIAN_PACKAGE_NAME "libprint-dev")
+set(CPACK_DEBIAN_PACKAGE_PREDEPENDS "cmake >= 3.0")
+set(CPACK_DEBIAN_PACKAGE_RELEASE 1)
+EOF
+```
+
+```sh
+$ cat >> CPackConfig.cmake <<EOF
+
+include(CPack)
 EOF
 ```
 
 ```sh
 $ cat >> CMakeLists.txt <<EOF
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+include(CPackConfig.cmake)
 EOF
 ```
 
 ```sh
-$ cat >> CMakeLists.txt <<EOF
-add_library(print STATIC \${CMAKE_CURRENT_SOURCE_DIR}/sources/print.cpp)
-EOF
+$ gsed -i 's/lab05/lab06/g' README.md
 ```
 
 ```sh
-$ cat >> CMakeLists.txt <<EOF
-include_directories(\${CMAKE_CURRENT_SOURCE_DIR}/include)
-EOF
+$ git add .
+$ git commit -m"added cpack config"
+$ git tag v0.1.0.0
+$ git push origin master --tags
+```
+
+```sh
+$ travis login --auto
+$ travis enable
 ```
 
 ```sh
 $ cmake -H. -B_build
 $ cmake --build _build
+$ cd _build
+$ cpack -G "TGZ"
+$ cd ..
 ```
 
 ```sh
-$ cat >> CMakeLists.txt <<EOF
-
-add_executable(example1 \${CMAKE_CURRENT_SOURCE_DIR}/examples/example1.cpp)
-add_executable(example2 \${CMAKE_CURRENT_SOURCE_DIR}/examples/example2.cpp)
-EOF
+$ cmake -H. -B_build -DCPACK_GENERATOR="TGZ"
+$ cmake --build _build --target package
 ```
 
 ```sh
-$ cat >> CMakeLists.txt <<EOF
-
-target_link_libraries(example1 print)
-target_link_libraries(example2 print)
-EOF
-```
-
-```sh
-$ cmake --build _build
-$ cmake --build _build --target print
-$ cmake --build _build --target example1
-$ cmake --build _build --target example2
-```
-
-```sh
-$ ls -la _build/libprint.a
-$ _build/example1 && echo
-hello
-$ _build/example2
-$ cat log.txt && echo
-hello
-$ rm -rf log.txt
-```
-
-```sh
-$ git clone https://github.com/tp-labs/lab03 tmp
-$ mv -f tmp/CMakeLists.txt .
-$ rm -rf tmp
-```
-
-```sh
-$ cat CMakeLists.txt
-$ cmake -H. -B_build -DCMAKE_INSTALL_PREFIX=_install
-$ cmake --build _build --target install
-$ tree _install
-```
-
-```sh
-$ git add CMakeLists.txt
-$ git commit -m"added CMakeLists.txt"
-$ git push origin master
+$ mkdir artifacts
+$ mv _build/*.tar.gz artifacts
+$ tree artifacts
 ```
 
 ## Report
 
 ```sh
 $ popd
-$ export LAB_NUMBER=03
+$ export LAB_NUMBER=06
 $ git clone https://github.com/tp-labs/lab${LAB_NUMBER} tasks/lab${LAB_NUMBER}
 $ mkdir reports/lab${LAB_NUMBER}
 $ cp tasks/lab${LAB_NUMBER}/README.md reports/lab${LAB_NUMBER}/REPORT.md
@@ -157,36 +180,57 @@ $ gist REPORT.md
 
 ## Homework
 
-Представьте, что вы стажер в компании "Formatter Inc.".
-### Задание 1
-Вам поручили перейти на систему автоматизированной сборки **CMake**.
-Исходные файлы находятся в директории [formatter_lib](formatter_lib).
-В этой директории находятся файлы для статической библиотеки *formatter*.
-Создайте `CMakeList.txt` в директории [formatter_lib](formatter_lib),
-с помощью которого можно будет собирать статическую библиотеку *formatter*.
+После того, как вы настроили взаимодействие с системой непрерывной интеграции,</br>
+обеспечив автоматическую сборку и тестирование ваших изменений, стоит задуматься</br>
+о создание пакетов для измениний, которые помечаются тэгами (см. вкладку [releases](https://github.com/tp-labs/lab06/releases)).</br>
+Пакет должен содержать приложение _solver_ из [предыдущего задания](https://github.com/tp-labs/lab03#задание-1)
+Таким образом, каждый новый релиз будет состоять из следующих компонентов:
+- архивы с файлами исходного кода (`.tar.gz`, `.zip`)
+- пакеты с бинарным файлом _solver_ (`.deb`, `.rpm`, `.msi`, `.dmg`)
 
-### Задание 2
-У компании "Formatter Inc." есть перспективная библиотека,
-которая является расширением предыдущей библиотеки. Т.к. вы уже овладели
-навыком созданием `CMakeList.txt` для статической библиотеки *formatter*, ваш 
-руководитель поручает заняться созданием `CMakeList.txt` для библиотеки 
-*formatter_ex*, которая в свою очередь использует библиотеку *formatter*.
+В качестве подсказки:
+```sh
+$ cat .travis.yml
+os: osx
+script:
+...
+- cpack -G DragNDrop # dmg
 
-### Задание 3
-Конечно же ваша компания предоставляет примеры использования своих библиотек.
-Чтобы продемонстрировать как работать с библиотекой *formatter_ex*,
-вам необходимо создать два `CMakeList.txt` для двух простых приложений:
-* *hello_world*, которое использует библиотеку *formatter_ex*;
-* *solver*, приложение которое испольует статические библиотеки *formatter_ex* и *solver_lib*.
+$ cat .travis.yml
+os: linux
+script:
+...
+- cpack -G DEB # deb
 
-**Удачной стажировки!**
+$ cat .travis.yml
+os: linux
+addons:
+  apt:
+    packages:
+    - rpm
+script:
+...
+- cpack -G RPM # rpm
+
+$ cat appveyor.yml
+platform:
+- x86
+- x64
+build_script:
+...
+- cpack -G WIX # msi
+```
+
+Для этого нужно добавить ветвление в конфигурационные файлы для **CI** со следующей логикой:</br>
+если **commit** помечен тэгом, то необходимо собрать пакеты (`DEB, RPM, WIX, DragNDrop, ...`) </br>
+и разместить их на сервисе **GitHub**. (см. пример для [Travi CI](https://docs.travis-ci.com/user/deployment/releases))</br>
 
 ## Links
-- [Основы сборки проектов на С/C++ при помощи CMake](https://eax.me/cmake/)
-- [CMake Tutorial](http://neerc.ifmo.ru/wiki/index.php?title=CMake_Tutorial)
-- [C++ Tutorial - make & CMake](https://www.bogotobogo.com/cplusplus/make.php)
-- [Autotools](http://www.gnu.org/software/automake/manual/html_node/Autotools-Introduction.html)
-- [CMake](https://cgold.readthedocs.io/en/latest/index.html)
+
+- [DMG](https://cmake.org/cmake/help/latest/module/CPackDMG.html)
+- [DEB](https://cmake.org/cmake/help/latest/module/CPackDeb.html)
+- [RPM](https://cmake.org/cmake/help/latest/module/CPackRPM.html)
+- [NSIS](https://cmake.org/cmake/help/latest/module/CPackNSIS.html)
 
 ```
 Copyright (c) 2015-2021 The ISC Authors
