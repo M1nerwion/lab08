@@ -8,68 +8,27 @@ on:
 
 jobs:
   rabota:
-    
+    runs-on: ${{ matrix.os }}
 
     strategy:
-      runs-on: ${{ matrix.os }}
       fail-fast: false
-      #matrix:
-        # include:
-        #   - os: ubuntu-latest
-        #     cpack_flag: DEB
-        #     extension: deb
-        #   - os: ubuntu-latest
-        #     cpack_flag: RPM
-        #     extension: rpm
-        #   - os: windows-latest
-        #     cpack_flag: WIX
-        #     extension: msi
-        #   - os: macos-latest
-        #     cpack_flag: DragNDrop
-        #     extension: dmg
       matrix:
-        #os: [ubuntu-latest, windows-latest, macos-latest]
-        build_type: [Release]
-        c_compiler: [gcc, clang, cl]
         include:
           - os: windows-latest
             cpack_flag: WIX
             extension: msi
-            c_compiler: cl
-            cpp_compiler: cl
-          - os: ubuntu-latest
-            cpack_flag: DEB
-            extension: deb
-            c_compiler: gcc
-            cpp_compiler: g++
-          - os: ubuntu-latest
-            cpack_flag: RPM
-            extension: rpm
-            c_compiler: gcc
-            cpp_compiler: g++
           - os: macos-latest
             cpack_flag: DragNDrop
             extension: dmg
-            c_compiler: clang
-            cpp_compiler: clang++
-        exclude:
-          - os: windows-latest
-            c_compiler: gcc
-          - os: windows-latest
-            c_compiler: clang
           - os: ubuntu-latest
-            c_compiler: cl
+            cpack_flag: DEB
+            extension: deb
           - os: ubuntu-latest
-            c_compiler: clang
-          - os: macos-latest
-            c_compiler: gcc
-          - os: macos-latest
-            c_compiler: cl  
-
+            cpack_flag: RPM
+            extension: rpm
+         
     steps:
     - uses: actions/checkout@v4
-      # with:
-      #  submodules: recursive
 
     - name: Install dependencies
       if: matrix.os == 'ubuntu-latest'
@@ -78,22 +37,6 @@ jobs:
         sudo apt-get install -y cmake
         sudo apt-get install rpm
 
-    - name: Set reusable strings
-      id: strings
-      shell: bash
-      run: |
-        echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
-
-    # - name: Configure CMake
-    #   run: >
-    #     cmake -B ${{ steps.strings.outputs.build-output-dir }}
-    #     -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
-    #     -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
-    #     -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
-    #     -S ${{ github.workspace }}
-
-    # - name: Build
-    #   run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
     - name: Configure CMake
       run: cmake -B build -DCMAKE_BUILD_TYPE=Release
 
@@ -117,18 +60,6 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: download_ubuntu_deb
-      uses: actions/download-artifact@v4
-      with:
-        name: ubuntu-latest-deb-pack
-        path: artifacts/linux
-
-    - name: download_ubuntu_rpm
-      uses: actions/download-artifact@v4
-      with:
-        name: ubuntu-latest-rpm-pack
-        path: artifacts/linux
-
     - name: download_windows
       uses: actions/download-artifact@v4
       with:
@@ -141,6 +72,18 @@ jobs:
         name: macos-latest-dmg-pack
         path: artifacts/macos
 
+    - name: download_ubuntu_deb
+      uses: actions/download-artifact@v4
+      with:
+        name: ubuntu-latest-deb-pack
+        path: artifacts/linux
+
+    - name: download_ubuntu_rpm
+      uses: actions/download-artifact@v4
+      with:
+        name: ubuntu-latest-rpm-pack
+        path: artifacts/linux
+
     - name: Create Release
       uses: softprops/action-gh-release@v2
       with:
@@ -152,7 +95,4 @@ jobs:
           artifacts/windows/*.msi
           artifacts/macos/*.dmg 
           
-
-        # env:
-        #   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
