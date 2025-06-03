@@ -12,6 +12,6 @@ RUN cd build && cpack -G DEB
 
 # VOLUME /data
 RUN cd build/hello_world_application && ls
-COPY /_build/hello_world_application/main data
+COPY /build/hello_world_application/main data
 
-CMD ["./_build/hello_world_application/main"]
+CMD ["./build/hello_world_application/main"]
