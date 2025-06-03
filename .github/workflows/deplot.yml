@@ -18,8 +18,9 @@ jobs:
       run: |
         sudo docker volume create my_data
         sudo docker build -t docker-hello .
-        sudo docker run -d -v my_data:/data docker-hello
-      # sudo docker run docker-hello
+        sudo docker run docker-hello
+      #  sudo docker run -d -v my_data:/data docker-hello
+       
 
      # Output build artifacts to /github/workspace on the container.
     - name: Containerized Build
